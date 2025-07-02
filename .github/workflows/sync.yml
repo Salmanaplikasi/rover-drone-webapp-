@@ -1,0 +1,31 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Setiap jam
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream & fetch
+        run: |
+          git remote add upstream https://github.com/NAMA_USER_TEMAN/rover-drone-webapp.git
+          git fetch upstream
+          git merge upstream/main --allow-unrelated-histories --no-edit || true
+
+      - name: Push changes
+        run: |
+          git push origin main || true
